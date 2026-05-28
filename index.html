@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#08080e">
+  <meta name="description" content="Easy-Opencode 3.0 — эволюция AI-разработки. Сравнение версий v1, v2 и v3.">
+  <meta property="og:title" content="Easy-Opencode 3.0 — Эволюция AI-разработки">
+  <meta property="og:description" content="Из идеи в готовый продукт одной командой /run">
+  <meta property="og:type" content="website">
+  <title>Easy-Opencode 3.0 — Эволюция AI-разработки</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #08080e;
+      --bg-secondary: #0e0e18;
+      --bg-card: rgba(16, 16, 30, 0.55);
+      --bg-card-solid: #12121e;
+      --text-primary: #eaeaef;
+      --text-secondary: #9090b4;
+      --text-muted: #58587a;
+      --accent-1: #6c5ce7;
+      --accent-1-rgb: 108, 92, 231;
+      --accent-2: #a855f7;
+      --accent-2-rgb: 168, 85, 247;
+      --accent-3: #3b82f6;
+      --accent-3-rgb: 59, 130, 246;
+      --accent-4: #10b981;
+      --accent-4-rgb: 16, 185, 129;
+      --green: #22c55e;
+      --green-rgb: 34, 197, 94;
+      --green-glow: rgba(34, 197, 94, 0.15);
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --pink: #ec4899;
+      --border: rgba(108, 92, 231, 0.12);
+      --radius: 18px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+      --transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      --nav-height: 64px;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection { background: rgba(108, 92, 231, 0.4); color: #fff; }
+
+    /* ===== PARTICLES ===== */
+    #particles-canvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    @media (max-width: 768px) { #particles-canvas { opacity: 0.6; } }
+    @media (prefers-reduced-motion: reduce) { #particles-canvas { display: none; } }
+
+    /* ===== GRADIENT BLOBS ===== */
+    .bg-gradient-blob {
+      position: fixed; border-radius: 50%; filter: blur(120px);
+      pointer-events: none; z-index: 0; opacity: 0.12;
+    }
+    .bg-gradient-blob:nth-child(2) { width: 700px; height: 700px; background: var(--accent-1); top: -15%; left: -10%; animation: blobSlow 25s ease-in-out infinite; }
+    .bg-gradient-blob:nth-child(3) { width: 550px; height: 550px; background: var(--accent-2); bottom: -10%; right: -8%; animation: blobSlow 25s ease-in-out infinite -8s; }
+    .bg-gradient-blob:nth-child(4) { width: 600px; height: 600px; background: var(--accent-4); top: 50%; left: 50%; animation: blobSlow 25s ease-in-out infinite -16s; opacity: 0.08; }
+    .bg-gradient-blob:nth-child(5) { width: 400px; height: 400px; background: var(--pink); top: 20%; left: 70%; animation: blobSlow 30s ease-in-out infinite -5s; opacity: 0.06; }
+
+    @media (max-width: 768px) {
+      .bg-gradient-blob { filter: blur(80px); opacity: 0.08; }
+      .bg-gradient-blob:nth-child(2) { width: 400px; height: 400px; }
+      .bg-gradient-blob:nth-child(3) { width: 350px; height: 350px; }
+      .bg-gradient-blob:nth-child(4) { width: 300px; height: 300px; display: none; }
+      .bg-gradient-blob:nth-child(5) { display: none; }
+    }
+
+    @keyframes blobSlow {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(80px, -60px) scale(1.08); }
+      50% { transform: translate(-30px, 80px) scale(0.92); }
+      75% { transform: translate(-70px, -40px) scale(1.05); }
+    }
+
+    .vignette {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(8,8,14,0.6) 100%);
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(108, 92, 231, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(108, 92, 231, 0.025) 1px, transparent 1px);
+      background-size: 70px 70px;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-height); padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: transparent; transition: var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(8, 8, 14, 0.88);
+      backdrop-filter: blur(24px) saturate(1.3);
+      -webkit-backdrop-filter: blur(24px) saturate(1.3);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-weight: 800; font-size: 1rem; color: var(--text-primary);
+      text-decoration: none; letter-spacing: -0.02em; flex-shrink: 0;
+    }
+    .nav-logo .logo-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .nav-logo .badge {
+      background: linear-gradient(135deg, var(--accent-4), var(--green));
+      padding: 0.1rem 0.45rem; border-radius: 999px;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.04em;
+    }
+
+    .nav-toggle {
+      display: none; width: 40px; height: 40px; border: none;
+      background: rgba(108, 92, 231, 0.1); border-radius: 10px;
+      cursor: pointer; padding: 0; position: relative; z-index: 101;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .nav-toggle:active { transform: scale(0.92); }
+    .nav-toggle span {
+      display: block; width: 20px; height: 2px; background: var(--text-primary);
+      border-radius: 2px; margin: 5px auto; transition: var(--transition);
+    }
+    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .nav-toggle.active span:nth-child(2) { opacity: 0; }
+    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; transition: color 0.3s;
+      position: relative; -webkit-tap-highlight-color: transparent;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0;
+      width: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      transition: width 0.3s ease; border-radius: 1px;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+
+    @media (max-width: 820px) {
+      .nav-toggle { display: block; }
+      .nav-links {
+        position: fixed; top: 0; right: -100%;
+        width: min(350px, 80vw); height: 100vh;
+        background: rgba(8, 8, 14, 0.97);
+        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+        flex-direction: column; align-items: flex-start; justify-content: center;
+        gap: 0; padding: 6rem 2.5rem;
+        transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        border-left: 1px solid var(--border); z-index: 99;
+      }
+      .nav-links.open { right: 0; }
+      .nav-links li { width: 100%; }
+      .nav-links a { display: block; font-size: 1.2rem; padding: 1rem 0; border-bottom: 1px solid rgba(108, 92, 231, 0.06); width: 100%; }
+      .nav-links a::after { display: none; }
+      .nav-links a:active { color: var(--accent-2); }
+      .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 98; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+      .nav-overlay.open { opacity: 1; pointer-events: auto; }
+    }
+
+    /* ===== SECTIONS ===== */
+    section { position: relative; z-index: 1; padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--accent-2);
+      background: rgba(168, 85, 247, 0.08);
+      padding: 0.3rem 0.9rem; border-radius: 999px;
+      margin-bottom: 1.2rem; border: 1px solid rgba(168, 85, 247, 0.12);
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 4.5vw, 3rem);
+      font-weight: 800; line-height: 1.12; margin-bottom: 0.7rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 30%, var(--accent-2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-sub {
+      font-size: 1rem; color: var(--text-secondary);
+      max-width: 680px; margin-bottom: 2.5rem; line-height: 1.7;
+    }
+
+    /* ===== HERO ===== */
+    #hero {
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center;
+      padding-top: calc(var(--nav-height) + 2rem); padding-bottom: 3rem;
+    }
+
+    .hero-version-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(34, 197, 94, 0.12));
+      border: 1px solid rgba(34, 197, 94, 0.18);
+      padding: 0.3rem 1rem 0.3rem 0.7rem; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600; color: var(--green);
+      margin-bottom: 1.5rem; animation: fadeUp 0.9s ease-out;
+    }
+    .hero-version-tag .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: pulseDot 2.2s ease-in-out infinite;
+      box-shadow: 0 0 14px var(--green-glow); flex-shrink: 0;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.75); }
+    }
+
+    #hero h1 {
+      font-size: clamp(2rem, 7.5vw, 5rem); font-weight: 900;
+      line-height: 1.02; margin-bottom: 1rem;
+      letter-spacing: -0.03em; animation: fadeUp 0.9s ease-out 0.1s both;
+    }
+    #hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-4));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; background-size: 300% 300%; animation: gradShift 6s ease-in-out infinite;
+    }
+    @keyframes gradShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-desc {
+      font-size: clamp(0.9rem, 1.8vw, 1.2rem); color: var(--text-secondary);
+      max-width: 720px; margin-bottom: 1.8rem; padding: 0 0.5rem;
+      animation: fadeUp 0.9s ease-out 0.2s both;
+    }
+
+    .hero-badges {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 0.6rem; margin-bottom: 2rem;
+      animation: fadeUp 0.9s ease-out 0.3s both; padding: 0 0.5rem;
+    }
+    .hero-badges .badge-item {
+      display: flex; align-items: center; gap: 0.35rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 0.4rem 0.85rem; border-radius: 999px;
+      font-size: 0.7rem; color: var(--text-secondary);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-actions {
+      display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 0.9s ease-out 0.4s both; padding: 0 1rem;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.8rem 1.6rem; border-radius: 999px;
+      font-weight: 600; font-size: 0.85rem; text-decoration: none;
+      transition: all 0.35s ease; cursor: pointer; border: none;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; white-space: nowrap;
+    }
+    @media (max-width: 400px) { .btn { width: 100%; white-space: normal; text-align: center; font-size: 0.82rem; padding: 0.75rem 1.2rem; } }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: #fff; box-shadow: 0 4px 28px var(--accent-glow);
+    }
+    .btn-primary:hover, .btn-primary:active { transform: translateY(-2px); box-shadow: 0 8px 40px var(--accent-glow); }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent-4), var(--green));
+      color: #fff; box-shadow: 0 4px 28px var(--green-glow);
+    }
+    .btn-accent:hover, .btn-accent:active { transform: translateY(-2px); box-shadow: 0 8px 40px var(--green-glow); }
+
+    .btn-secondary {
+      background: var(--bg-card); color: var(--text-primary);
+      border: 1px solid var(--border); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .btn-secondary:hover, .btn-secondary:active { border-color: var(--accent-1); background: rgba(108, 92, 231, 0.08); transform: translateY(-2px); }
+
+    .hero-scroll { margin-top: 3rem; animation: fadeUp 0.9s ease-out 0.6s both; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.65rem; letter-spacing: 0.06em; }
+    @media (max-width: 600px) { .hero-scroll { display: none; } }
+
+    .scroll-indicator { width: 20px; height: 32px; border: 2px solid var(--text-muted); border-radius: 10px; position: relative; }
+    .scroll-indicator::after { content: ''; position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 3px; height: 6px; background: var(--accent-4); border-radius: 2px; animation: scrollAnim 2s ease-in-out infinite; }
+    @keyframes scrollAnim { 0% { transform: translateX(-50%) translateY(0); opacity: 1; } 75% { transform: translateX(-50%) translateY(12px); opacity: 0; } 100% { transform: translateX(-50%) translateY(0); opacity: 1; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== VERSION CARDS ===== */
+    .version-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 900px) { .version-grid { grid-template-columns: 1fr; } }
+
+    .version-card {
+      border-radius: var(--radius); padding: 2rem 1.5rem;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      position: relative; overflow: hidden;
+    }
+
+    .version-card.v1 { background: rgba(12, 12, 24, 0.4); border-color: rgba(239, 68, 68, 0.12); }
+    .version-card.v2 { background: rgba(108, 92, 231, 0.06); border-color: rgba(108, 92, 231, 0.22); box-shadow: 0 0 60px rgba(108, 92, 231, 0.04); }
+    .version-card.v3 {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(34, 197, 94, 0.04));
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 60px rgba(16, 185, 129, 0.06);
+    }
+
+    .version-card.v3::before {
+      content: 'НОВИНКА';
+      position: absolute; top: 16px; right: -34px;
+      background: linear-gradient(135deg, var(--accent-4), var(--green));
+      color: #fff; padding: 0.2rem 3.2rem; font-size: 0.55rem;
+      font-weight: 700; letter-spacing: 0.08em;
+      transform: rotate(45deg);
+    }
+
+    .version-card .vc-title {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem;
+    }
+    .version-card .vc-version {
+      font-size: 0.62rem; font-weight: 600; padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+    }
+    .version-card.v1 .vc-version { background: rgba(239,68,68,0.12); color: var(--red); }
+    .version-card.v2 .vc-version { background: rgba(108,92,231,0.12); color: var(--accent-2); }
+    .version-card.v3 .vc-version { background: rgba(34,197,94,0.12); color: var(--green); }
+
+    .version-card .vc-sub { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem; }
+    .version-card .vc-price {
+      font-size: 1.8rem; font-weight: 900; margin-bottom: 0.8rem;
+    }
+    .version-card.v1 .vc-price { color: var(--text-muted); }
+    .version-card.v2 .vc-price { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .version-card.v3 .vc-price { background: linear-gradient(135deg, var(--accent-4), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .version-card .vc-price .currency { font-size: 0.8rem; }
+    .version-card .vc-price .period { font-size: 0.6rem; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); }
+
+    .vc-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
+    .vc-list li {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5;
+    }
+    .vc-list li .icon { flex-shrink: 0; margin-top: 2px; }
+    .vc-list li .icon.check { color: var(--green); }
+    .vc-list li .icon.cross { color: var(--red); opacity: 0.5; }
+    .vc-list li .icon.star { color: var(--amber); }
+    .vc-list li .icon.new { color: var(--accent-4); }
+
+    .vc-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem; margin-top: 0.8rem; padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .vc-stat { text-align: center; }
+    .vc-stat .num { font-size: 1.1rem; font-weight: 800; display: block; }
+    .vc-stat .num.red { color: var(--red); }
+    .vc-stat .num.purple { color: var(--accent-2); }
+    .vc-stat .num.green { color: var(--green); }
+    .vc-stat .label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ===== COMPARISON TABLE ===== */
+    #comparison { scroll-margin-top: var(--nav-height); }
+
+    .table-wrap {
+      margin-top: 2rem; border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden;
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table thead th {
+      text-align: left; padding: 1rem 1.2rem;
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600;
+      background: rgba(10, 10, 20, 0.35);
+      border-bottom: 1px solid var(--border);
+    }
+    .comp-table thead th:nth-child(1) { width: 28%; }
+    .comp-table thead th:nth-child(2) { width: 20%; }
+    .comp-table thead th:nth-child(3) { width: 20%; }
+    .comp-table thead th:nth-child(4) { width: 32%; }
+
+    .comp-table td {
+      padding: 0.85rem 1.2rem; font-size: 0.82rem;
+      border-bottom: 1px solid rgba(108, 92, 231, 0.05);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table td:first-child { font-weight: 600; color: var(--text-primary); font-size: 0.78rem; white-space: normal; }
+    .comp-table td .v1-fade { color: var(--text-muted); font-size: 0.78rem; }
+    .comp-table td .v2-highlight { color: var(--accent-2); font-weight: 600; display: block; font-size: 0.82rem; }
+    .comp-table td .v3-highlight { color: var(--green); font-weight: 600; display: block; font-size: 0.82rem; }
+    .comp-table td .v3-detail { font-size: 0.68rem; color: var(--text-muted); font-weight: 400; display: block; margin-top: 2px; }
+    .comp-table td .v2-detail { font-size: 0.68rem; color: var(--text-muted); font-weight: 400; display: block; margin-top: 2px; }
+    .comp-table tbody tr { transition: background 0.25s; }
+    @media (hover: hover) { .comp-table tbody tr:hover { background: rgba(108, 92, 231, 0.03); } }
+
+    /* Mobile table */
+    @media (max-width: 700px) {
+      .table-wrap { overflow: visible; }
+      .comp-table, .comp-table thead, .comp-table tbody, .comp-table th, .comp-table td, .comp-table tr { display: block; }
+      .comp-table thead { display: none; }
+      .comp-table tbody tr { padding: 1rem 1.2rem; border-bottom: 1px solid rgba(108, 92, 231, 0.06); display: flex; flex-wrap: wrap; gap: 0.3rem; }
+      .comp-table tbody tr:last-child { border-bottom: none; }
+      .comp-table td { padding: 0; border: none !important; width: auto; }
+      .comp-table td:first-child { width: 100%; font-size: 0.82rem; margin-bottom: 0.15rem; }
+      .comp-table td:nth-child(2) { color: var(--text-muted); font-size: 0.7rem; margin-right: 0.6rem; }
+      .comp-table td:first-child::after { content: ':'; }
+      .comp-table td:nth-child(2)::before { content: 'v1 '; color: var(--red); font-weight: 600; }
+      .comp-table td:nth-child(3)::before { content: 'v2 '; color: var(--accent-2); font-weight: 600; }
+      .comp-table td:nth-child(4)::before { content: 'v3 '; color: var(--green); font-weight: 600; }
+      .comp-table td .v3-detail { display: inline; font-size: 0.62rem; margin-left: 0.2rem; }
+      .comp-table td .v2-detail { display: inline; font-size: 0.62rem; margin-left: 0.2rem; }
+    }
+
+    /* ===== FEATURES GRID ===== */
+    #features { scroll-margin-top: var(--nav-height); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.2rem; margin-top: 1.5rem;
+    }
+    @media (max-width: 360px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.8rem; transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent-4), var(--green));
+      opacity: 0; transition: opacity 0.35s;
+    }
+    @media (hover: hover) { .feature-card:hover::before { opacity: 1; } .feature-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(16, 185, 129, 0.06); } }
+    @media (hover: none) { .feature-card::before { opacity: 1; } }
+
+    .feature-card .fc-icon {
+      width: 40px; height: 40px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 0.9rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(34, 197, 94, 0.08));
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .feature-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.65; }
+    .feature-card code {
+      background: rgba(108, 92, 231, 0.1); padding: 0.1rem 0.3rem;
+      border-radius: 4px; font-size: 0.82em; color: var(--accent-2);
+    }
+
+    /* ===== PIPELINE ===== */
+    #pipeline { scroll-margin-top: var(--nav-height); }
+
+    .pipeline-visual {
+      display: flex; flex-direction: column; gap: 0.6rem;
+      margin-top: 1.5rem; max-width: 900px;
+    }
+
+    .pipeline-step {
+      display: flex; gap: 1rem; align-items: center;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1rem 1.3rem;
+      transition: var(--transition); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    @media (hover: hover) { .pipeline-step:hover { border-color: rgba(16, 185, 129, 0.25); transform: translateX(4px); } }
+    @media (max-width: 600px) { .pipeline-step { flex-direction: column; gap: 0.4rem; padding: 0.8rem 1rem; } }
+
+    .pipeline-step .ps-num {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.75rem; color: #fff;
+    }
+    .pipeline-step .ps-num.discuss { background: #7B68EE; }
+    .pipeline-step .ps-num.spec { background: #6c5ce7; }
+    .pipeline-step .ps-num.arch { background: #E67E22; }
+    .pipeline-step .ps-num.des { background: #E91E63; }
+    .pipeline-step .ps-num.build { background: #4A90D9; }
+    .pipeline-step .ps-num.test { background: #27AE60; }
+    .pipeline-step .ps-num.review { background: #F39C12; }
+    .pipeline-step .ps-num.fix { background: #C0392B; }
+    .pipeline-step .ps-num.verify { background: #1ABC9C; }
+    .pipeline-step .ps-num.ship { background: #10B981; }
+
+    .pipeline-step .ps-label { font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .pipeline-step .ps-arrow { color: var(--text-muted); font-size: 0.7rem; }
+    .pipeline-step .ps-desc { font-size: 0.78rem; color: var(--text-secondary); margin-left: auto; text-align: right; }
+
+    @media (max-width: 600px) {
+      .pipeline-step .ps-desc { margin-left: 0; text-align: left; }
+      .pipeline-step .ps-arrow { display: none; }
+    }
+
+    /* ===== PRICE ===== */
+    #price { scroll-margin-top: var(--nav-height); }
+
+    .price-showcase {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; align-items: center;
+    }
+    @media (max-width: 750px) { .price-showcase { grid-template-columns: 1fr; } }
+
+    .price-info {
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 2rem;
+    }
+    @media (max-width: 400px) { .price-info { padding: 1.5rem; } }
+
+    .price-big {
+      font-size: 2.8rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-4), var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1; margin-bottom: 0.3rem;
+    }
+    .price-big .currency { font-size: 1.2rem; }
+
+    .price-label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+    .price-details { display: flex; flex-direction: column; gap: 0.7rem; }
+    .price-detail-item { display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.85rem; color: var(--text-secondary); }
+    .price-detail-item .pd-icon { flex-shrink: 0; width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; }
+    .price-detail-item .pd-icon.green { background: rgba(34,197,94,0.12); color: var(--green); }
+
+    .price-visual { display: flex; flex-direction: column; gap: 0.8rem; }
+    .price-bar { display: flex; align-items: center; gap: 0.8rem; }
+    .price-bar .bar-label { width: 130px; font-size: 0.72rem; color: var(--text-secondary); flex-shrink: 0; text-align: right; }
+    @media (max-width: 400px) { .price-bar { flex-direction: column; align-items: stretch; gap: 0.3rem; } .price-bar .bar-label { width: auto; text-align: left; font-size: 0.68rem; } }
+
+    .price-bar .bar-track { flex: 1; height: 28px; background: rgba(10, 10, 20, 0.4); border-radius: 5px; overflow: hidden; position: relative; }
+    .price-bar .bar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5rem; font-size: 0.65rem; font-weight: 700; color: #fff; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); width: 0%; }
+    .price-bar .bar-fill.v1-fill { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+    .price-bar .bar-fill.v2-fill { background: linear-gradient(90deg, #22c55e, #10b981); }
+    .price-bar .bar-fill.v3-fill { background: linear-gradient(90deg, #10b981, #34d399); }
+    .price-bar .bar-fill.animated.v1-fill { width: 85%; }
+    .price-bar .bar-fill.animated.v2-fill { width: 12%; }
+    .price-bar .bar-fill.animated.v3-fill { width: 3%; }
+
+    .savings-box { margin-top: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.1rem; }
+    .savings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .savings-row .label { font-size: 0.8rem; color: var(--text-secondary); }
+    .savings-row .value { font-size: 1.3rem; font-weight: 800; color: var(--green); }
+    .savings-bar { width: 100%; height: 5px; background: rgba(10, 10, 20, 0.4); border-radius: 3px; overflow: hidden; }
+    .savings-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--green), #4ade80); border-radius: 3px; transition: width 1.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    .savings-bar-fill.animated { width: 99.9%; }
+
+    /* ===== FINAL CTA ===== */
+    #final { text-align: center; padding-bottom: 6rem; }
+    #final h2 { max-width: 800px; margin-left: auto; margin-right: auto; }
+    #final .section-sub { margin-left: auto; margin-right: auto; }
+
+    .made-with {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.06));
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: var(--radius-sm); padding: 0.85rem 1.4rem;
+      margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);
+      flex-wrap: wrap; justify-content: center;
+    }
+    .made-with strong { color: var(--green); }
+
+    .final-benefits { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin: 1.5rem 0; }
+    .final-benefits .fb-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--text-secondary); }
+
+    /* ===== FOOTER ===== */
+    footer { position: relative; z-index: 1; text-align: center; padding: 1.5rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.72rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 820px) { nav { padding: 0 1.2rem; } section { padding: 4.5rem 1rem; } #hero { padding-top: calc(var(--nav-height) + 1.5rem); } }
+    @media (max-width: 600px) { section { padding: 3.5rem 0.8rem; } #hero { padding-top: calc(var(--nav-height) + 1rem); padding-bottom: 2rem; } .version-grid { gap: 0.8rem; } .features-grid { gap: 0.8rem; } }
+    @media (max-width: 400px) { html { font-size: 15px; } section { padding: 3rem 0.6rem; } .section-label { font-size: 0.62rem; padding: 0.25rem 0.7rem; } .section-sub { font-size: 0.88rem; } .version-card { padding: 1.5rem; } .feature-card { padding: 1.3rem; } .price-big { font-size: 2.2rem; } }
+    @media (max-width: 360px) { html { font-size: 14px; } .nav-links { width: 85vw; padding: 5rem 1.5rem; } .nav-links a { font-size: 1rem; padding: 0.8rem 0; } }
+    @media (max-height: 500px) and (orientation: landscape) { #hero { min-height: auto; padding-top: calc(var(--nav-height) + 1rem); padding-bottom: 2rem; } .hero-scroll { display: none; } .hero-badges { display: none; } #hero h1 { font-size: clamp(1.6rem, 5vw, 2.5rem); } }
+    @media (min-width: 821px) and (max-width: 1024px) { section { padding: 5rem 2rem; } .version-grid { grid-template-columns: repeat(3, 1fr); } .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1400px) { section { max-width: 1300px; } }
+    @media print { #particles-canvas, .bg-gradient-blob, .grid-overlay, nav, .hero-scroll { display: none !important; } body { background: #fff; color: #111; } section { padding: 2rem 0; } }
+
+    /* ===== REVEAL ===== */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+    .reveal-d4 { transition-delay: 0.4s; }
+    .reveal-d5 { transition-delay: 0.5s; }
+  </style>
+</head>
+<body>
+
+  <!-- Effects -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="bg-gradient-blob"></div>
+  <div class="bg-gradient-blob"></div>
+  <div class="bg-gradient-blob"></div>
+  <div class="bg-gradient-blob"></div>
+  <div class="vignette"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <span class="logo-icon">⚡</span>
+      Easy-Opencode <span class="badge">3.0</span>
+    </a>
+    <div class="nav-overlay" id="navOverlay"></div>
+    <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#versions" class="nav-link">Версии</a></li>
+      <li><a href="#comparison" class="nav-link">Сравнение</a></li>
+      <li><a href="#features" class="nav-link">Фишки 3.0</a></li>
+      <li><a href="#pipeline" class="nav-link">Pipeline</a></li>
+      <li><a href="#price" class="nav-link">Цена</a></li>
+      <li><a href="#final" class="nav-link">Скачать</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-version-tag">
+      <span class="dot"></span>
+      Версия 3.0 — Из идеи в продукт
+    </div>
+    <h1>Эволюция <span class="gradient">AI-разработки</span></h1>
+    <p class="hero-desc">
+      Easy-Opencode 3.0 — суперпак навыков для OpenCode. Превращает AI-агента в полноценную команду разработки.
+      Из любой идеи — готовый, протестированный, премиальный продукт. Одной командой <strong>/run</strong>.
+    </p>
+    <div class="hero-badges">
+      <span class="badge-item">🚀 /run pipeline</span>
+      <span class="badge-item">🛡️ Self-Healing</span>
+      <span class="badge-item">✅ 6-layer verify</span>
+      <span class="badge-item">🎨 Премиум дизайн</span>
+      <span class="badge-item">🤖 9 агентов</span>
+      <span class="badge-item">📦 ~4 MB</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#versions" class="btn btn-primary">Смотреть версии →</a>
+      <a href="#final" class="btn btn-accent">🚀 Скачать 3.0</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-indicator"></div>
+      <span>Листайте вниз</span>
+    </div>
+  </section>
+
+  <!-- VERSIONS -->
+  <section id="versions">
+    <div class="reveal">
+      <span class="section-label">📊 Версии</span>
+      <h2>v1 → v2 → v3: Эволюция</h2>
+      <p class="section-sub">
+        Три поколения Easy-Opencode. От базового набора навыков до полноценного AI-pipeline,
+        который из идеи делает готовый продукт.
+      </p>
+    </div>
+
+    <div class="version-grid">
+      <!-- v1 -->
+      <div class="version-card v1 reveal reveal-d1">
+        <div class="vc-title">
+          <span>📦 Easy-Opencode</span>
+          <span class="vc-version">v1.0</span>
+        </div>
+        <p class="vc-sub">Первый релиз — основа</p>
+        <div class="vc-price"><span class="currency">$</span>0</div>
+        <ul class="vc-list">
+          <li><span class="icon check">✅</span> 8 базовых агентов</li>
+          <li><span class="icon check">✅</span> 5 паков навыков</li>
+          <li><span class="icon check">✅</span> 9 MCP серверов</li>
+          <li><span class="icon cross">❌</span> Depth=1 guard</li>
+          <li><span class="icon cross">❌</span> Caveman-режим</li>
+          <li><span class="icon cross">❌</span> Self-installing</li>
+        </ul>
+        <div class="vc-stats">
+          <div class="vc-stat"><span class="num red">~30</span><span class="label">файлов</span></div>
+          <div class="vc-stat"><span class="num red">16</span><span class="label">команд</span></div>
+          <div class="vc-stat"><span class="num red">5</span><span class="label">паков</span></div>
+        </div>
+      </div>
+
+      <!-- v2 -->
+      <div class="version-card v2 reveal reveal-d2">
+        <div class="vc-title">
+          <span>🚀 Easy-Opencode</span>
+          <span class="vc-version">2.0</span>
+        </div>
+        <p class="vc-sub">Полностью переработанная архитектура</p>
+        <div class="vc-price"><span class="currency">$</span>0</div>
+        <ul class="vc-list">
+          <li><span class="icon check">✅</span> 8 агентов + Depth=1 guard</li>
+          <li><span class="icon check">✅</span> 6 паков (90+ навыков)</li>
+          <li><span class="icon check">✅</span> 4 hook-скрипта</li>
+          <li><span class="icon star">⭐</span> Caveman Adaptive (~75% экономии)</li>
+          <li><span class="icon star">⭐</span> Self-installing</li>
+          <li><span class="icon cross">❌</span> /run pipeline</li>
+          <li><span class="icon cross">❌</span> Self-Healing</li>
+        </ul>
+        <div class="vc-stats">
+          <div class="vc-stat"><span class="num purple">90+</span><span class="label">файлов</span></div>
+          <div class="vc-stat"><span class="num purple">10</span><span class="label">команд</span></div>
+          <div class="vc-stat"><span class="num purple">6</span><span class="label">паков</span></div>
+        </div>
+      </div>
+
+      <!-- v3 -->
+      <div class="version-card v3 reveal reveal-d3">
+        <div class="vc-title">
+          <span>🤖 Easy-Opencode</span>
+          <span class="vc-version">3.0</span>
+        </div>
+        <p class="vc-sub">Из идеи в готовый продукт одной командой</p>
+        <div class="vc-price"><span class="currency">$</span><span class="period">0</span></div>
+        <ul class="vc-list">
+          <li><span class="icon check">✅</span> 9 агентов + @run orchestrator</li>
+          <li><span class="icon new">🚀</span> <strong>/run pipeline</strong> — идея→продукт</li>
+          <li><span class="icon new">🛡️</span> <strong>Self-Healing</strong> — авточника багов</li>
+          <li><span class="icon new">✅</span> <strong>6-layer verification</strong></li>
+          <li><span class="icon new">🎨</span> <strong>Премиум дизайн</strong> (ui-ux-pro-max)</li>
+          <li><span class="icon star">⭐</span> Caveman + Depth=1 + hooks</li>
+          <li><span class="icon new">📊</span> <strong>v3-core</strong> — 12 новых навыков</li>
+        </ul>
+        <div class="vc-stats">
+          <div class="vc-stat"><span class="num green">100+</span><span class="label">файлов</span></div>
+          <div class="vc-stat"><span class="num green">11</span><span class="label">команд</span></div>
+          <div class="vc-stat"><span class="num green">7</span><span class="label">паков</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section id="comparison">
+    <div class="reveal">
+      <span class="section-label">⚖️ Сравнение</span>
+      <h2>Детальное сравнение версий</h2>
+      <p class="section-sub">Каждая новая версия — фундаментальные улучшения архитектуры и возможностей</p>
+    </div>
+
+    <div class="table-wrap reveal">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Характеристика</th>
+            <th>v1.0</th>
+            <th>v2.0</th>
+            <th>v3.0 🚀</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Главная фича</td>
+            <td><span class="v1-fade">Базовый набор навыков</span></td>
+            <td><span class="v2-highlight">Depth=1 + Caveman</span><span class="v2-detail">Безопасность + экономия</span></td>
+            <td><span class="v3-highlight">🚀 /run pipeline</span><span class="v3-detail">Идея → готовый продукт</span></td>
+          </tr>
+          <tr>
+            <td>Агенты</td>
+            <td><span class="v1-fade">8 агентов</span></td>
+            <td><span class="v2-highlight">8 + Depth=1</span><span class="v2-detail">@build — единственный диспетчер</span></td>
+            <td><span class="v3-highlight">9 + @run orchestrator</span><span class="v3-detail">@run и @build — диспетчеры</span></td>
+          </tr>
+          <tr>
+            <td>Pipeline</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v2-highlight">GSD lifecycle</span><span class="v2-detail">/plan с 5 фазами</span></td>
+            <td><span class="v3-highlight">🚀 /run — 10 фаз</span><span class="v3-detail">DISCUSS→SPEC→ARCH→DESIGN→BUILD→TEST→REVIEW→FIX→VERIFY→SHIP</span></td>
+          </tr>
+          <tr>
+            <td>Self-Healing</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v3-highlight">✅ Автоисправление багов</span><span class="v3-detail">3 цикла fix→verify, regression tests</span></td>
+          </tr>
+          <tr>
+            <td>Тестирование</td>
+            <td><span class="v1-fade">❌ Базовое</span></td>
+            <td><span class="v2-highlight">Unit + Integration + E2E</span><span class="v2-detail">80%+ coverage, TDD</span></td>
+            <td><span class="v3-highlight">✅ 6-layer testing</span><span class="v3-detail">Unit + Integration + E2E + Security + Visual + Performance</span></td>
+          </tr>
+          <tr>
+            <td>Дизайн</td>
+            <td><span class="v1-fade">❌ Базовый</span></td>
+            <td><span class="v2-highlight">ui-ux-pro-max</span><span class="v2-detail">67 стилей, 161 палитра</span></td>
+            <td><span class="v3-highlight">🎨 Премиум стандарт</span><span class="v3-detail">OKLCH, glassmorphism, WCAG 2.2 AA, micro-interactions</span></td>
+          </tr>
+          <tr>
+            <td>Depth=1 guard</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v2-highlight">✅ Есть</span><span class="v2-detail">@build — единственный</span></td>
+            <td><span class="v3-highlight">✅ @build + @run</span><span class="v3-detail">Два диспетчера, Depth=1 guard</span></td>
+          </tr>
+          <tr>
+            <td>Caveman</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v2-highlight">✅ До 75% экономии</span><span class="v2-detail">4 уровня: lite, full, ultra, wenyan</span></td>
+            <td><span class="v3-highlight">✅ Caveman + расширение</span><span class="v3-detail">+self-heal триггеры, adaptive</span></td>
+          </tr>
+          <tr>
+            <td>Hook-система</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v2-highlight">✅ 4 hook-скрипта</span><span class="v2-detail">dispatch, caveman, context, read-guard</span></td>
+            <td><span class="v3-highlight">✅ 4 hook-скрипта</span><span class="v3-detail">+ auto-checkpoint, enhanced context</span></td>
+          </tr>
+          <tr>
+            <td>Context management</td>
+            <td><span class="v1-fade">❌ Нет</span></td>
+            <td><span class="v2-highlight">Базовый</span><span class="v2-detail">context-monitor.js</span></td>
+            <td><span class="v3-highlight">✅ Context AI</span><span class="v3-detail">Auto-checkpoint каждые 20 turns, budget tiers</span></td>
+          </tr>
+          <tr>
+            <td>Безопасность</td>
+            <td><span class="v1-fade">❌ Базовая</span></td>
+            <td><span class="v2-highlight">OWASP + STRIDE</span><span class="v2-detail">security-review skill</span></td>
+            <td><span class="v3-highlight">✅ Security Hardening</span><span class="v3-detail">CSP, rate limiting, SCA, secrets mgmt</span></td>
+          </tr>
+          <tr>
+            <td>Паки навыков</td>
+            <td><span class="v1-fade">5 паков</span></td>
+            <td><span class="v2-highlight">6 паков</span><span class="v2-detail">90+ bundled skills</span></td>
+            <td><span class="v3-highlight">7 паков</span><span class="v3-detail">100+ skills, v3-core с 12 новыми</span></td>
+          </tr>
+          <tr>
+            <td>Установка</td>
+            <td><span class="v1-fade">📄 install.bat/.sh</span></td>
+            <td><span class="v2-highlight">🤖 Self-installing</span><span class="v2-detail">«установи» — агент сам настроит</span></td>
+            <td><span class="v3-highlight">🤖 Self-installing v3</span><span class="v3-detail">Ещё быстрее, авто-обнаружение</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="reveal">
+      <span class="section-label">🏆 Фишки 3.0</span>
+      <h2>Что делает v3.0 прорывом</h2>
+      <p class="section-sub">Шесть ключевых инноваций, которых нет ни в одной другой системе</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-d1">
+        <div class="fc-icon">🚀</div>
+        <h3>@run — Полный Pipeline</h3>
+        <p>
+          Команда <strong>/run</strong> запускает 10-фазный pipeline: от обсуждения идеи до готового продукта.
+          @run последовательно вызывает @planner → @architect → @designer → @build → @tester → @reviewer → @deployer.
+          Каждая фаза — чёткий артефакт, quality gate и автоматический переход.
+        </p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="fc-icon">🛡️</div>
+        <h3>Self-Healing — Автоисправление</h3>
+        <p>
+          Если тесты упали или ревью нашло проблему — агент автоматически исправляет баг.
+          Анализирует root cause, фиксит код, добавляет regression test, перезапускает тесты.
+          Максимум 3 цикла — затем полный отчёт. Ни один баг не остаётся незамеченным.
+        </p>
+      </div>
+      <div class="feature-card reveal reveal-d3">
+        <div class="fc-icon">✅</div>
+        <h3>6-Layer Verification</h3>
+        <p>
+          Шестиуровневая система проверки: Unit (70%) → Integration (20%) → E2E (10%) → 
+          Security (OWASP) → Visual (UI snapshots) → Performance (Lighthouse 90+).
+          Каждый слой должен пройти перед переходом к следующему. 80%+ total coverage.
+        </p>
+      </div>
+      <div class="feature-card reveal reveal-d4">
+        <div class="fc-icon">🎨</div>
+        <h3>Премиум Дизайн Стандарт</h3>
+        <p>
+          Интеграция с ui-ux-pro-max v2.5.0. OKLCH цветовые палитры, glassmorphism,
+          модульная типографика (scale 1.25), micro-interactions (150-300ms),
+          WCAG 2.2 AA доступность, responsive mobile-first. Каждый продукт выглядит премиально.
+        </p>
+      </div>
+      <div class="feature-card reveal reveal-d1">
+        <div class="fc-icon">📊</div>
+        <h3>Context AI — Умный Контекст</h3>
+        <p>
+          Автоматические checkpoint каждые 20 turns. Мониторинг бюджета контекста
+          (PEAK/GOOD/DEGRADING/POOR). Умные рекомендации по compaction.
+          Сохранение состояния сессии для восстановления после потери контекста.
+        </p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="fc-icon">🧩</div>
+        <h3>v3-core — 12 новых навыков</h3>
+        <p>
+          Седьмой пак навыков: run-pipeline, premium-design, self-healing, multi-layer-test,
+          context-ai, auto-checkpoint, quality-gate, ship-ready, security-hardening,
+          performance-audit, accessibility-check, seo-optimizer. Всё для создания
+          сложных, готовых к продакшену продуктов.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <div class="reveal">
+      <span class="section-label">🔧 Pipeline</span>
+      <h2>Как работает /run</h2>
+      <p class="section-sub">
+        Одна команда запускает полный цикл создания продукта. 
+        Каждый этап — специализированный агент с quality gate.
+      </p>
+    </div>
+
+    <div class="pipeline-visual reveal">
+      <div class="pipeline-step">
+        <span class="ps-num discuss">1</span>
+        <span class="ps-label">DISCUSS</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@planner уточняет требования, задаёт вопросы</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num spec">2</span>
+        <span class="ps-label">SPEC</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">SPEC.md с критериями приёмки, acceptance criteria</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num arch">3</span>
+        <span class="ps-label">ARCHITECT</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@architect: C4 диаграммы, ADR, tech stack</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num des">4</span>
+        <span class="ps-label">DESIGN</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@designer: премиум UI/UX, дизайн-токены</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num build">5</span>
+        <span class="ps-label">BUILD</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@build: TDD-реализация, тесты сначала</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num test">6</span>
+        <span class="ps-label">TEST</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@tester: 6-layer verification, 80%+ coverage</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num review">7</span>
+        <span class="ps-label">REVIEW</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@reviewer: multi-layer review + security audit</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num fix">8</span>
+        <span class="ps-label">FIX</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@build: Self-Healing, исправление найденных проблем</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num verify">9</span>
+        <span class="ps-label">VERIFY</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">@tester: перепроверка после фиксов</span>
+      </div>
+      <div class="pipeline-step">
+        <span class="ps-num ship">10</span>
+        <span class="ps-label">SHIP</span>
+        <span class="ps-arrow">→</span>
+        <span class="ps-desc">✅ Готовый продукт — протестированный, премиальный, безопасный</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE -->
+  <section id="price">
+    <div class="reveal">
+      <span class="section-label">💰 Цена</span>
+      <h2>Сколько стоит создание продукта?</h2>
+      <p class="section-sub">
+        Вся эта страница — от идеи до готового кода — создана за <strong>одну команду /run</strong>.
+        Ни одной строки вручную.
+      </p>
+    </div>
+
+    <div class="price-showcase">
+      <div class="price-info reveal reveal-d1">
+        <div class="price-big"><span class="currency">$</span>0.42</div>
+        <p class="price-label">Полная стоимость разработки через Easy-Opencode 3.0</p>
+        <div class="price-details">
+          <div class="price-detail-item">
+            <span class="pd-icon green">✓</span>
+            <span><strong>$0.00</strong> — Easy-Opencode 3.0 (Open Source, MIT)</span>
+          </div>
+          <div class="price-detail-item">
+            <span class="pd-icon green">✓</span>
+            <span><strong>$0.28</strong> — API токены на весь pipeline</span>
+          </div>
+          <div class="price-detail-item">
+            <span class="pd-icon green">✓</span>
+            <span><strong>$0.14</strong> — Тестирование, ревью и доводка</span>
+          </div>
+          <div class="price-detail-item">
+            <span class="pd-icon green">✓</span>
+            <span><strong>~10 минут</strong> — От идеи до готового продукта</span>
+          </div>
+          <div class="price-detail-item">
+            <span class="pd-icon green">✓</span>
+            <span><strong>0 строк</strong> кода написано вручную</span>
+          </div>
+        </div>
+        <p class="price-note" style="font-size:0.75rem;color:var(--text-muted);margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--border);">
+          * @run оркестрирует, @build пишет код, @designer создаёт дизайн, @reviewer проверяет, @tester тестирует
+        </p>
+      </div>
+
+      <div class="price-visual reveal reveal-d2">
+        <div class="price-bar">
+          <span class="bar-label">👨‍💻 Фрилансер</span>
+          <div class="bar-track">
+            <div class="bar-fill v1-fill" id="barFreelance">~$500-2000</div>
+          </div>
+        </div>
+        <div class="price-bar">
+          <span class="bar-label">🏢 Студия</span>
+          <div class="bar-track">
+            <div class="bar-fill v1-fill" id="barStudio">~$3000-10000</div>
+          </div>
+        </div>
+        <div class="price-bar">
+          <span class="bar-label">🤖 v3.0</span>
+          <div class="bar-track">
+            <div class="bar-fill v3-fill" id="barV3">$0.42</div>
+          </div>
+        </div>
+
+        <div class="savings-box">
+          <div class="savings-row">
+            <span class="label">Экономия vs студия</span>
+            <span class="value">~99.99%</span>
+          </div>
+          <div class="savings-bar">
+            <div class="savings-bar-fill" id="savingsFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="final">
+    <div class="reveal">
+      <div class="made-with">
+        <span>⚡</span>
+        Эта страница создана <strong>Easy-Opencode 3.0</strong> (команда /run)
+        <span>⚡</span>
+      </div>
+
+      <h2>Готов превратить OpenCode в AI-команду?</h2>
+      <p class="section-sub">
+        Скачайте архив, распакуйте в корень проекта и скажите агенту:
+        <strong>«установи Easy-Opencode 3.0»</strong>. Всё остальное он сделает сам.
+      </p>
+
+      <div class="final-benefits">
+        <span class="fb-item">🚀 /run pipeline</span>
+        <span class="fb-item">🛡️ Self-Healing</span>
+        <span class="fb-item">🎨 Премиум дизайн</span>
+        <span class="fb-item">✅ 6-layer verify</span>
+        <span class="fb-item">💰 Бесплатно (MIT)</span>
+      </div>
+
+      <div class="hero-actions">
+        <a href="https://github.com/Regulus12qqw2/Easy-Opencode-3.0/releases/download/v1.0.0/Easy-Opencode-3.0.zip" class="btn btn-accent" download>📥 Скачать Easy-Opencode 3.0</a>
+        <a href="#versions" class="btn btn-secondary">← Сравнить версии</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Easy-Opencode 3.0 | MIT License | Создано для OpenCode-сообщества</p>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    // Particles
+    (function initParticles() {
+      const canvas = document.getElementById('particles-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let mouseX = -9999, mouseY = -9999;
+      let w, h;
+      let isMobile = window.innerWidth < 768;
+      let isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (isReducedMotion) return;
+
+      function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+      window.addEventListener('resize', resize);
+      resize();
+
+      document.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) { mouseX = t.clientX; mouseY = t.clientY; } }, { passive: true });
+      document.addEventListener('touchend', () => { mouseX = -9999; mouseY = -9999; }, { passive: true });
+      document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+      const COLORS = ['108, 92, 231', '168, 85, 247', '59, 130, 246', '16, 185, 129'];
+      const COUNT = isMobile ? 40 : 100;
+
+      class Particle {
+        constructor() { this.reset(true); }
+        reset(initial) {
+          this.x = Math.random() * w; this.y = Math.random() * h;
+          this.size = 1 + Math.random() * 2;
+          this.speedX = (Math.random() - 0.5) * (isMobile ? 0.15 : 0.25);
+          this.speedY = (Math.random() - 0.5) * (isMobile ? 0.15 : 0.25);
+          this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+          this.baseOpacity = 0.15 + Math.random() * 0.5;
+          this.opacity = this.baseOpacity;
+          this.phase = Math.random() * Math.PI * 2;
+          this.speed = 0.005 + Math.random() * 0.01;
+          if (!initial) { this.x = Math.random() * w; this.y = -10; }
+        }
+        update(time) {
+          const dx = mouseX - this.x, dy = mouseY - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < (isMobile ? 120 : 250)) {
+            const force = (1 - dist / (isMobile ? 120 : 250)) * 0.004;
+            this.speedX += (dx / dist) * force; this.speedY += (dy / dist) * force;
+          }
+          this.x += this.speedX; this.y += this.speedY;
+          this.speedX *= 0.99; this.speedY *= 0.99;
+          this.opacity = this.baseOpacity + Math.sin(time * this.speed + this.phase) * 0.1;
+          if (this.x < -30) this.x = w + 30; if (this.x > w + 30) this.x = -30;
+          if (this.y < -30) this.y = h + 30; if (this.y > h + 30) this.y = -30;
+          return dist;
+        }
+        draw() {
+          ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`; ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+      function animate(time) {
+        ctx.clearRect(0, 0, w, h);
+        const connectDist = isMobile ? 100 : 160;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < connectDist) {
+              const alpha = (1 - dist / connectDist) * (isMobile ? 0.06 : 0.12);
+              ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(108, 92, 231, ${alpha})`; ctx.lineWidth = 0.5; ctx.stroke();
+            }
+          }
+        }
+        for (const p of particles) { p.update(time); p.draw(); }
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    })();
+
+    // Nav toggle
+    (function navToggle() {
+      const toggle = document.getElementById('navToggle');
+      const links = document.getElementById('navLinks');
+      const overlay = document.getElementById('navOverlay');
+      const navLinks = document.querySelectorAll('.nav-link');
+      function open() { links.classList.add('open'); overlay.classList.add('open'); toggle.classList.add('active'); document.body.style.overflow = 'hidden'; }
+      function close() { links.classList.remove('open'); overlay.classList.remove('open'); toggle.classList.remove('active'); document.body.style.overflow = ''; }
+      toggle.addEventListener('click', () => { links.classList.contains('open') ? close() : open(); });
+      overlay.addEventListener('click', close);
+      navLinks.forEach(link => link.addEventListener('click', close));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && links.classList.contains('open')) close(); });
+    })();
+
+    // Scroll reveal
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Smooth anchors
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = anchor.getAttribute('href');
+        if (id === '#') return;
+        const target = document.querySelector(id);
+        if (target) {
+          const pos = target.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: pos, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Price bar animation
+    const priceObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.getElementById('barFreelance')?.classList.add('animated');
+          document.getElementById('barStudio')?.classList.add('animated');
+          document.getElementById('barV3')?.classList.add('animated');
+          document.getElementById('savingsFill')?.classList.add('animated');
+        }
+      });
+    }, { threshold: 0.2 });
+    const priceEl = document.querySelector('#price');
+    if (priceEl) priceObserver.observe(priceEl);
+
+    // Download tracking
+    document.querySelectorAll('[download]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const original = this.innerHTML;
+        this.innerHTML = '⬇️ Скачивается...';
+        this.style.pointerEvents = 'none';
+        setTimeout(() => { this.innerHTML = original; this.style.pointerEvents = ''; }, 3000);
+      });
+    });
+  </script>
+</body>
+</html>
